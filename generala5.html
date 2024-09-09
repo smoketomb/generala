@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generala - Conteo de Puntos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #09e21f;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        input[type="number"], input[type="text"] {
+            width: 50px;
+            text-align: center;
+        }
+        select {
+            width: 100px;
+            text-align: center;
+        }
+        .probabilidad {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .tiradas {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Generala - Conteo de Puntos</h1>
+
+    <form id="jugadoresForm">
+        <label for="numJugadores">Número de jugadores (entre 2 y 10):</label>
+        <input type="number" id="numJugadores" name="numJugadores" min="2" max="10" value="2">
+        <button type="button" onclick="generarTabla()">Generar Tabla</button>
+    </form>
+
+    <div id="tablaPuntos"></div>
+
+    <div class="tiradas" id="tiradasDiv">
+        <h2>Registrar Tiradas para un Jugador</h2>
+        <label for="jugadorSeleccionado">Selecciona un jugador:</label>
+        <select id="jugadorSeleccionado"></select>
+        <button type="button" onclick="registrarTiradas()">Registrar Tiradas</button>
+        <div id="resultadoTiradas"></div>
+    </div>
+
+    <div class="probabilidad" id="probabilidadDiv">
+        <h2>Probabilidades de Combinaciones</h2>
+        <p id="probabilidades">Las probabilidades se calcularán aquí...</p>
+    </div>
+
+    <script>
+        function generarTabla() {
+            const numJugadores = document.getElementById('numJugadores').value;
+            const tablaDiv = document.getElementById('tablaPuntos');
+            const seleccionJugador = document.getElementById('jugadorSeleccionado');
+            tablaDiv.innerHTML = '';
+
+            // Crear formulario para ingresar los nombres de los jugadores
+            let nombresFormulario = '<h2>Introduce los nombres de los jugadores:</h2>';
+            seleccionJugador.innerHTML = ''; // Limpiar opciones anteriores
+            for (let i = 1; i <= numJugadores; i++) {
+                nombresFormulario += `<label for="jugador${i}">Jugador ${i}:</label>
+                                      <input type="text" id="jugador${i}" value="Jugador ${i}">
+                                      <br><br>`;
+                // Añadir opciones al select para elegir un jugador
+                seleccionJugador.innerHTML += `<option value="${i}">Jugador ${i}</option>`;
+            }
+            nombresFormulario += `<button type="button" onclick="mostrarTabla()">Mostrar Tabla de Puntos</button>`;
+            tablaDiv.innerHTML = nombresFormulario;
+        }
+
+        function mostrarTabla() {
+            const numJugadores = document.getElementById('numJugadores').value;
+            const tablaDiv = document.getElementById('tablaPuntos');
+            let nombresJugadores = [];
+
+            // Recoger los nombres de los jugadores
+            for (let i = 1; i <= numJugadores; i++) {
+                let nombre = document.getElementById(`jugador${i}`).value;
+                nombresJugadores.push(nombre);
+            }
+
+            // Crear tabla de puntuación
+            let tabla = '<table>';
+            tabla += '<tr><th>Jugador</th><th>Pareja</th><th>Trío</th><th>Escalera</th><th>Full</th><th>Póker</th><th>Generala</th><th>1</th><th>2</th><th>J</th><th>Q</th><th>K</th><th>AS</th></tr>';
+            
+            // Generar filas para cada jugador con nombre
+            for (let i = 0; i < numJugadores; i++) {
+                tabla += `<tr>
+                            <td>${nombresJugadores[i]}</td>
+                            <td>
+                                <select id="pareja${i}">
+                                    <option value="0">0</option>
+                                    <option value="10">10</option>
+                                    <option value="15">15</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select id="trio${i}">
+                                    <option value="0">0</option>
+                                    <option value="20">20</option>
+                                    <option value="25">25</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select id="escalera${i}">
+                                    <option value="0">0</option>
+                                    <option value="30">30</option>
+                                    <option value="35">35</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select id="full${i}">
+                                    <option value="0">0</option>
+                                    <option value="40">40</option>
+                                    <option value="45">45</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select id="poker${i}">
+                                    <option value="0">0</option>
+                                    <option value="50">50</option>
+                                    <option value="55">55</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select id="generala${i}">
+                                    <option value="0">0</option>
+                                    <option value="60">60</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select id="uno${i}">
+                                    <option value="0">0</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
+                            </td>
+                             <td>
+                                <select id="dos${i}">
+                                    <option value="0">0</option>
+                                    <option value="2">2</option>
+                                    <option value="4">4</option>
+                                    <option value="6">6</option>
+                                    <option value="8">8</option>
+                                    <option value="10">10</option>
+                                </select>
+                            </td>
+                             <td>
+                                <select id="tres${i}">
+                                    <option value="0">0</option>
+                                    <option value="3">3</option>
+                                    <option value="6">6</option>
+                                    <option value="9">9</option>
+                                    <option value="12">12</option>
+                                    <option value="15">15</option>
+                                </select>
+                            </td>
+                             <td>
+                                <select id="cuatro${i}">
+                                    <option value="0">0</option>
+                                    <option value="4">4</option>
+                                    <option value="8">8</option>
+                                    <option value="12">12</option>
+                                    <option value="16">16</option>
+                                    <option value="20">20</option>
+                                </select>
+                            </td>
+                             <td>
+                                <select id="cinco${i}">
+                                    <option value="0">0</option>
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="15">15</option>
+                                    <option value="20">20</option>
+                                    <option value="25">25</option>
+                                </select>
+                            </td>
+                             <td>
+                                <select id="seis${i}">
+                                    <option value="0">0</option>
+                                    <option value="6">6</option>
+                                    <option value="12">12</option>
+                                    <option value="18">18</option>
+                                    <option value="24">24</option>
+                                    <option value="30">30</option>
+                                </select>
+                            </td>
+                        </tr>`;
+            }
+
+            tabla += '</table>';
+            tablaDiv.innerHTML = tabla;
+        }
+
+        function registrarTiradas() {
+            const jugadorSeleccionado = document.getElementById('jugadorSeleccionado').value;
+            const resultadoTiradas = document.getElementById('resultadoTiradas');
+
+            resultadoTiradas.innerHTML = `<h3>Registrar tiradas para Jugador ${jugadorSeleccionado}</h3>
+                <p>Tirada 1: 
+                   <input type="text" id="tirada1_${jugadorSeleccionado}" placeholder="1,2,3,4,5">
+                </p>
+                <p>Dados a mantener en Tirada 2:
+                   <input type="text" id="mantener_${jugadorSeleccionado}" placeholder="1,2,3">
+                </p>
+                <p>Tirada 2: 
+                   <input type="text" id="tirada2_${jugadorSeleccionado}" placeholder="1,2,3,4,5">
+                </p>
+                <p>Dados a mantener en Tirada 3:
+                   <input type="text" id="mantener2_${jugadorSeleccionado}" placeholder="1,2,3">
+                </p>
+                <p>Tirada 3: 
+                   <input type="text" id="tirada3_${jugadorSeleccionado}" placeholder="1,2,3,4,5">
+                </p>
+                <button type="button" onclick="calcularProbabilidades()">Calcular Probabilidades</button>`;
+        }
+
+        function calcularProbabilidades() {
+            const jugadorSeleccionado = document.getElementById('jugadorSeleccionado').value;
+            let tirada1 = document.getElementById(`tirada1_${jugadorSeleccionado}`).value.split(',').map(Number).filter(Boolean);
+            let mantener1 = document.getElementById(`mantener_${jugadorSeleccionado}`).value.split(',').map(Number).filter(Boolean);
+            let tirada2 = document.getElementById(`tirada2_${jugadorSeleccionado}`).value.split(',').map(Number).filter(Boolean);
+            let mantener2 = document.getElementById(`mantener2_${jugadorSeleccionado}`).value.split(',').map(Number).filter(Boolean);
+            let tirada3 = document.getElementById(`tirada3_${jugadorSeleccionado}`).value.split(',').map(Number).filter(Boolean);
+
+            // Determinar los dados que se mantienen de la primera y segunda tirada
+            let dadosMantenidosTirada1 = [...mantener1];
+            let dadosMantenidosTirada2 = [...mantener2];
+            let dadosRestantesTirada2 = 5 - dadosMantenidosTirada1.length;
+            let dadosRestantesTirada3 = 5 - (dadosMantenidosTirada1.length + tirada2.length);
+
+            // Generar todas las posibles combinaciones para los dados restantes en tirada 2 y 3
+            let combinaciones = generarCombinaciones(dadosRestantesTirada2, dadosRestantesTirada3);
+
+            // Contar las combinaciones válidas
+            let conteoCombinaciones = {
+                pareja: 0,
+                trio: 0,
+                escalera: 0,
+                full: 0,
+                poker: 0,
+                generala: 0
+            };
+
+            let tipoCombinacionTirada1 = analizarTirada(tirada1);
+            let tipoCombinacionTirada2 = analizarTirada(tirada2);
+            let combinacionesRestantes = combinaciones;
+
+            if (tipoCombinacionTirada1 !== 'ninguna') {
+                // Si ya tenemos una combinación en la tirada 1, la probabilidad de esa combinación es 100%
+                conteoCombinaciones[tipoCombinacionTirada1] = combinaciones.length;
+                combinacionesRestantes = []; // No necesitamos generar combinaciones adicionales
+            } else {
+                // Si no se ha obtenido una combinación, calcular basado en combinaciones
+                combinacionesRestantes.forEach(combinacion => {
+                    let finalTirada2 = [...dadosMantenidosTirada1, ...tirada2, ...combinacion];
+                    let tipoCombinacionFinalTirada2 = analizarTirada(finalTirada2);
+                    if (tipoCombinacionFinalTirada2 !== 'ninguna') {
+                        conteoCombinaciones[tipoCombinacionFinalTirada2]++;
+                    }
+                    // Evaluar también si la combinación se mantiene para la tirada final
+                    if (tipoCombinacionFinalTirada2 === 'ninguna') {
+                        let finalTirada3 = [...dadosMantenidosTirada1, ...tirada2, ...combinacion, ...tirada3];
+                        let tipoCombinacionFinalTirada3 = analizarTirada(finalTirada3);
+                        if (tipoCombinacionFinalTirada3 !== 'ninguna') {
+                            conteoCombinaciones[tipoCombinacionFinalTirada3]++;
+                        }
+                    }
+                });
+            }
+
+            let totalCombinaciones = combinacionesRestantes.length || 1; // Evitar división por cero si ya se ha obtenido combinación
+
+            // Calcular probabilidades en base a combinaciones
+            const probabilidadDiv = document.getElementById('probabilidades');
+            let probabilidades = `<p>Pareja: ${(conteoCombinaciones.pareja / totalCombinaciones * 100).toFixed(2)}%</p>
+                                  <p>Trío: ${(conteoCombinaciones.trio / totalCombinaciones * 100).toFixed(2)}%</p>
+                                  <p>Escalera: ${(conteoCombinaciones.escalera / totalCombinaciones * 100).toFixed(2)}%</p>
+                                  <p>Full: ${(conteoCombinaciones.full / totalCombinaciones * 100).toFixed(2)}%</p>
+                                  <p>Póker: ${(conteoCombinaciones.poker / totalCombinaciones * 100).toFixed(2)}%</p>
+                                  <p>Generala: ${(conteoCombinaciones.generala / totalCombinaciones * 100).toFixed(2)}%</p>`;
+            probabilidadDiv.innerHTML = probabilidades;
+        }
+
+        function analizarTirada(tirada) {
+            let conteo = {};
+            tirada.forEach(dado => conteo[dado] = (conteo[dado] || 0) + 1);
+            let valores = Object.values(conteo).sort((a, b) => b - a);
+
+            if (valores[0] === 5) return 'generala';
+            if (valores[0] === 4) return 'poker';
+            if (valores[0] === 3 && valores[1] === 2) return 'full';
+            if (valores[0] === 3) return 'trio';
+            if (valores[0] === 2 && valores[1] === 2) return 'pareja';
+            if (escalera(tirada)) return 'escalera';
+
+            return 'ninguna';
+        }
+
+        function escalera(tirada) {
+            let dadosOrdenados = tirada.sort((a, b) => a - b);
+            let secuencia = [1, 2, 3, 4, 5];
+            return dadosOrdenados.every((valor, index) => valor === secuencia[index]);
+        }
+
+        function generarCombinaciones(dadosRestantesTirada2, dadosRestantesTirada3) {
+            let combinaciones = [];
+            let posiblesValores = [1, 2, 3, 4, 5, 6];
+
+            function generarCombinacionesRecursivas(tirada, cantidadRestante) {
+                if (cantidadRestante === 0) {
+                    combinaciones.push(tirada);
+                    return;
+                }
+                for (let valor of posiblesValores) {
+                    generarCombinacionesRecursivas([...tirada, valor], cantidadRestante - 1);
+                }
+            }
+
+            generarCombinacionesRecursivas([], dadosRestantesTirada2 + dadosRestantesTirada3);
+            return combinaciones;
+        }
+    </script>
+
+</body>
+</html>
+
+
